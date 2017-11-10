@@ -26,15 +26,16 @@ def checkVulns(banner):
 
 def main():
     portlist = [21,22,25,80,110,443]
+    IP4 = input("Enter your current IPconfig E.G 192.168.1\n ==> ")
     for x in range(1,255):
-        ip = '192.168.1.' + str(x)
+        ip = IP4 + str(x)
         for port in portlist:
             banner = retBanner(ip,port)
             if banner:
                 print("[+]" + ip + ':' + banner)
                 checkVulns(banner)
             else:
-                print(ip + ':' + str(port) + 'is not vulnerable!')
+                print(ip + ':' + str(port) + ' is not vulnerable!')
 
 
 if __name__ == '__main__':
