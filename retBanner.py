@@ -1,4 +1,6 @@
 import socket
+import sys
+import os
 
 def retBanner(ip,port):
     try:
@@ -10,32 +12,35 @@ def retBanner(ip,port):
     except:
         return
 
-def checkVulns(banner):
-    if 'FreeFloat Ftp Server (Version 1.00)' in banner:
-        print('[+] FreeFloat FTP Server is vulnerable.')
-    elif '3Com 3CDaemon FTP Server Version 2.0' in banner:
-        print ('[+] 3CDaemon FTP Server is vulnerable.')
-    elif 'Ability Server 2.34' in banner:
-        print('[+] Ability FTP Server is vulnerable.')
-    elif 'Sami FTP Server 2.0.2' in banner:
-        print('[+] Sami FTP Server is vulnerable.')
-    else:
-        print('[-] FTP Server is not vulnerable.')
-    return
-
+def checkVulns(banner,filename):
+    f = open(filename)
+    for line in f.readlines():
+        if line.strip('\n') in banner:
+            print('[+] Server is vulnerable ' + banner.strip('\n'))
 
 def main():
-    portlist = [21,22,25,80,110,443]
-    IP4 = input("Enter your current IPconfig E.G 192.168.1\n ==> ")
-    for x in range(1,255):
-        ip = IP4 + str(x)
-        for port in portlist:
-            banner = retBanner(ip,port)
-            if banner:
-                print("[+]" + ip + ':' + banner)
-                checkVulns(banner)
-            else:
-                print(ip + ':' + str(port) + ' is not vulnerable!')
+
+    if len(sys.argv) == 2:
+        filename = sys.argv[1]
+        if not os.path.isfile(filename):
+            print('[-] ' + filename + ' does not exist')
+            exit(0)
+        if not os.access(filename, os.R_OK):
+            print('[-] ' + filename + ' access denied')
+            exit(0)
+        else:
+            print('[-] Usage: ' +str(sys.argv[0]) + '<Vuln Filename>')
+            portlist = [21,22,25,80,110,443]
+            # IP4 = input("Enter your current IPconfig E.G 192.168.1\n ==> ")
+            for x in range(1,255):
+                ip = filename
+                for port in portlist:
+                    banner = retBanner(ip,port)
+                    if banner:
+                        print("[+]" + ip + ':' + banner)
+                        checkVulns(banner, filename)
+                    else:
+                        print('[-]' + ip + ':' +   str(port) + ' is not vulnerable!')
 
 
 if __name__ == '__main__':
